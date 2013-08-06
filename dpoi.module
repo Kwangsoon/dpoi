@@ -1,0 +1,105 @@
+<?php
+
+require_once('dpoi.widgets.inc');
+require_once('dpoi.formatters.inc');
+require_once('dpoi.openlayers.inc');
+require_once('dpoi.ajax.inc');
+
+/**
+ * Implements hook_help()
+ *
+ * @param path
+ * @param arg
+*/
+function dpoi_help($path, $arg) {
+	switch ($path) {
+		case "admin/help#dpoi":
+			return '<p>' . t("This is the module for getting placeid
+					and geohash code for developer") . '</p>';
+	}
+	return '';
+}
+
+/**
+ * Implements hook_node_info() to provide dpoi type.
+ */
+function dpoi_node_info() {
+	variable_set('openlayers_source', 'http://openlayers.org/api/2.12/OpenLayers.js');
+	variable_set('node_options_dpoi', array('status'));
+	return array(
+			'dpoi' => array(
+					'name' => t('DPOI'),
+					'base' => 'dpoi',
+					'description' => t('Use DPOI for getting Geohash code and Place ID.'),
+					'has_title' => TRUE,
+					'title_label' => t('title'),
+			),
+	);
+}
+
+/**
+ * Implement hook_form() with the standard default form.
+ */
+function dpoi_form($node, $form_state) {
+	return node_content_form($node, $form_state);
+}
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+function dpoi_menu_alter(&$callbacks) {
+	if (!user_access('administer nodes')) {
+		$callbacks['node/add/dpoi']['access callback'] = FALSE;
+		unset($callbacks['node/add/dpoi']['access arguments']);
+	}
+}
+
+/**
+ * Implements hook_views_api().
+ * Register View API information.
+ */
+function dpoi_views_api() {
+	return array('api' => 3.0);
+}
+
+function dpoi_rdf_namespaces(){
+	return array(
+			'gn' => 'http://www.geonames.org/ontology#',
+			'wgs84_pos' => 'http://www.w3.org/2003/01/geo/wgs84_pos#',
+			'media' => 'http://www.w3.org/ns/ma-ont#',
+			'address' => 'http://schemas.talis.com/2005/address/schema#',
+			'dcterm' => 'http://purl.org/dc/terms/',
+	);
+}
+
+function dpoi_rdf_mapping(){
+	return array(
+			array(
+					'type' => 'node',
+					'bundle' => 'dpoi',
+					'mapping' => array(
+							'poi_firstimage' => array(
+									'predicates' => array('foaf:img'),
+							),
+							'poi_zipcode' => array(
+									'predicates' => array('gn:postalCode'),
+							),
+							'poi_address' => array(
+									'predicates' => array('address:streetaddress'),
+							),
+							'poi_homepage' => array(
+									'predicates' => array('foaf:homepage'),
+							),
+							'poi_tel' => array(
+									'predicates' => array('foaf:tel'),
+							),
+							'poi_overview' => array(
+									'predicates' => array('rdfs:comment'),
+							),
+							'poi_videourl' => array(
+									'predicates' => array('dc:description'),
+							),
+					),
+			),
+	);
+}

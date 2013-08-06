@@ -1,0 +1,14 @@
+name = DPOI
+description = This is the module for getting Place ID and Geohash code and installing KTO content types.
+core = 7.x
+package = DPOI
+version = "7.x-1.0-dev"
+
+dependencies[] = openlayers_ui
+dependencies[] = geofield
+dependencies[] = sparql
+dependencies[] = rdfx
+
+files[] = dpoi.openlayers.inc
+files[] = dpoi.widgets.inc
+files[] = dpoi.formatters.inc
